@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🏨 Hotel AI Assistant</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
+    .app { display: flex; height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; background: #1a1a2e; color: #fff; display: flex; flex-direction: column; padding: 0; }
+    .sidebar-header { padding: 20px 16px; border-bottom: 1px solid #2a2a4e; }
+    .sidebar-header h1 { font-size: 16px; font-weight: 600; }
+    .sidebar-header p { font-size: 12px; color: #8888aa; margin-top: 4px; }
+    .nav-section { padding: 12px 16px 4px; font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-item { padding: 9px 16px; font-size: 13px; cursor: pointer; color: #bbb; border-radius: 6px; margin: 2px 8px; }
+    .nav-item:hover, .nav-item.active { background: #2a2a5e; color: #fff; }
+    .quick-queries { padding: 12px 8px; }
+    .quick-btn { display: block; width: 100%; text-align: left; padding: 8px 12px; margin-bottom: 4px; background: #16213e; border: 1px solid #2a2a5e; border-radius: 6px; color: #aaa; font-size: 12px; cursor: pointer; }
+    .quick-btn:hover { background: #2a2a5e; color: #fff; }
+    .sidebar-footer { margin-top: auto; padding: 16px; font-size: 11px; color: #555; border-top: 1px solid #2a2a3e; }
+
+    /* Main */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar { background: #fff; padding: 12px 24px; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center; justify-content: space-between; }
+    .topbar h2 { font-size: 15px; font-weight: 600; }
+    .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: #e8f5e9; color: #2e7d32; }
+
+    /* Dashboard */
+    .dashboard { display: none; padding: 20px 24px; overflow-y: auto; }
+    .dashboard.active { display: block; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .kpi-card { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #eee; }
+    .kpi-label { font-size: 12px; color: #888; margin-bottom: 6px; }
+    .kpi-value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+    .kpi-sub { font-size: 11px; color: #aaa; margin-top: 4px; }
+    .card { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #eee; margin-bottom: 16px; }
+    .card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #333; }
+
+    /* Pricing */
+    .price-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+    .price-row:last-child { border-bottom: none; }
+    .price-type { font-size: 13px; color: #444; }
+    .price-amount { font-size: 15px; font-weight: 600; color: #1a73e8; }
+    .rec-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+    .rec-INCREASE { background: #e8f5e9; color: #2e7d32; }
+    .rec-DECREASE, .rec-DISCOUNT { background: #ffebee; color: #c62828; }
+    .rec-MAINTAIN { background: #e3f2fd; color: #1565c0; }
+
+    /* Nationality bars */
+    .nat-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .nat-label { font-size: 12px; width: 80px; color: #555; }
+    .nat-bar-wrap { flex: 1; background: #f0f0f0; border-radius: 4px; height: 8px; }
+    .nat-bar { height: 8px; border-radius: 4px; background: #1a73e8; }
+    .nat-count { font-size: 12px; color: #888; width: 30px; text-align: right; }
+
+    /* Chat */
+    .chat-area { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+    .chat-area.active { display: flex; }
+    .messages { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { max-width: 75%; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5; }
+    .msg.user { background: #1a73e8; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.bot { background: #fff; color: #1a1a1a; align-self: flex-start; border: 1px solid #e5e5e5; border-bottom-left-radius: 4px; }
+    .msg .intent { font-size: 10px; opacity: 0.6; margin-top: 6px; }
+    .msg.bot .intent { text-align: left; }
+    .typing { display: flex; gap: 4px; padding: 8px; align-self: flex-start; }
+    .typing span { width: 8px; height: 8px; border-radius: 50%; background: #bbb; animation: bounce 1s infinite; }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-8px)} }
+    .chat-input-area { background: #fff; padding: 16px 24px; border-top: 1px solid #e5e5e5; display: flex; gap: 10px; }
+    .chat-input-area input { flex: 1; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; }
+    .chat-input-area input:focus { border-color: #1a73e8; }
+    .send-btn { padding: 10px 20px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+    .send-btn:hover { background: #1557b0; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>🏨 Hotel AI</h1>
+      <p>Grand Palace Hotel</p>
+    </div>
+    <div class="nav-section">Navigation</div>
+    <div class="nav-item active" onclick="showView('chat', this)">💬 Chat Assistant</div>
+    <div class="nav-item" onclick="showView('dashboard', this)">📊 Dashboard</div>
+    <div class="nav-section">Quick Queries</div>
+    <div class="quick-queries">
+      <button class="quick-btn" onclick="sendQuick('What was total revenue this month?')">💰 Monthly revenue</button>
+      <button class="quick-btn" onclick="sendQuick('What is the current occupancy rate?')">🏠 Occupancy rate</button>
+      <button class="quick-btn" onclick="sendQuick('Suggest pricing for tonight based on current demand')">📈 Pricing advice</button>
+      <button class="quick-btn" onclick="sendQuick('Who are our top 5 guest nationalities?')">🌍 Guest origins</button>
+      <button class="quick-btn" onclick="sendQuick('What is the cancellation policy?')">📋 Cancel policy</button>
+      <button class="quick-btn" onclick="sendQuick('Give me an operational summary for today')">📝 Daily summary</button>
+    </div>
+    <div class="sidebar-footer">AI Hotel Operations v1.0<br>Powered by LangChain + Groq</div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h2 id="view-title">Chat Assistant</h2>
+      <span class="badge" id="status-badge">● Online</span>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-area active" id="chat-view">
+      <div class="messages" id="messages">
+        <div class="msg bot">
+          👋 Hello! I'm your AI Hotel Operations Assistant.<br><br>
+          Ask me anything about <strong>revenue, bookings, guests, pricing, policies</strong>, or hotel operations.<br><br>
+          Try: <em>"What was our revenue this week?"</em> or <em>"What's the cancellation policy?"</em>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="user-input" placeholder="Ask about revenue, guests, policies..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button class="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard-view">
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card"><div class="kpi-label">Loading...</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="card">
+          <h3>💡 Pricing Recommendation</h3>
+          <div id="pricing-content">Loading...</div>
+        </div>
+        <div class="card">
+          <h3>🌍 Top Guest Nationalities</h3>
+          <div id="nat-content">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+
+function showView(view, el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('chat-view').classList.toggle('active', view === 'chat');
+  document.getElementById('chat-view').style.display = view === 'chat' ? 'flex' : 'none';
+  document.getElementById('dashboard-view').classList.toggle('active', view === 'dashboard');
+  document.getElementById('view-title').textContent = view === 'chat' ? 'Chat Assistant' : 'Operations Dashboard';
+  if (view === 'dashboard') loadDashboard();
+}
+document.getElementById('chat-view').style.display = 'flex';
+
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  appendMsg(text, 'user');
+  const typing = showTyping();
+  try {
+    const res = await fetch(`${API}/chat`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({message: text})
+    });
+    const data = await res.json();
+    typing.remove();
+    appendMsg(data.response, 'bot', data.intent);
+  } catch(e) {
+    typing.remove();
+    appendMsg('Error connecting to server. Is the API running?', 'bot');
+  }
+}
+
+function sendQuick(text) {
+  showView('chat', document.querySelector('.nav-item'));
+  document.getElementById('chat-view').style.display = 'flex';
+  document.getElementById('user-input').value = text;
+  sendMessage();
+}
+
+function appendMsg(text, role, intent) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = text.replace(/\n/g, '<br>') + (intent ? `<div class="intent">via ${intent} agent</div>` : '');
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function loadDashboard() {
+  try {
+    const [rev, pricing, guests] = await Promise.all([
+      fetch(`${API}/analytics/revenue`).then(r=>r.json()),
+      fetch(`${API}/analytics/pricing`).then(r=>r.json()),
+      fetch(`${API}/analytics/guests`).then(r=>r.json())
+    ]);
+    document.getElementById('kpi-grid').innerHTML = `
+      <div class="kpi-card"><div class="kpi-label">30-Day Revenue</div><div class="kpi-value">$${rev.total_revenue.toLocaleString()}</div><div class="kpi-sub">Last 30 days</div></div>
+      <div class="kpi-card"><div class="kpi-label">Avg Daily Revenue</div><div class="kpi-value">$${rev.avg_daily_revenue.toLocaleString()}</div><div class="kpi-sub">Per day average</div></div>
+      <div class="kpi-card"><div class="kpi-label">Occupancy Rate</div><div class="kpi-value">${rev.avg_occupancy_pct}%</div><div class="kpi-sub">30-day average</div></div>
+      <div class="kpi-card"><div class="kpi-label">RevPAR</div><div class="kpi-value">$${rev.revpar}</div><div class="kpi-sub">Revenue per room</div></div>
+    `;
+    const maxCount = Math.max(...guests.top_nationalities.map(n=>n.count));
+    document.getElementById('nat-content').innerHTML = guests.top_nationalities.map(n=>`
+      <div class="nat-row">
+        <div class="nat-label">${n.nationality}</div>
+        <div class="nat-bar-wrap"><div class="nat-bar" style="width:${Math.round(n.count/maxCount*100)}%"></div></div>
+        <div class="nat-count">${n.count}</div>
+      </div>
+    `).join('');
+    document.getElementById('pricing-content').innerHTML = `
+      <span class="rec-badge rec-${pricing.recommendation}">${pricing.recommendation} RATES</span>
+      <p style="font-size:13px;color:#666;margin-bottom:12px;">${pricing.reason} · Occupancy: ${pricing.current_occupancy_pct}%</p>
+      ${Object.entries(pricing.suggested_rates).map(([type,rate])=>`
+        <div class="price-row">
+          <span class="price-type">${type.charAt(0).toUpperCase()+type.slice(1)}</span>
+          <span class="price-amount">$${rate}/night</span>
+        </div>
+      `).join('')}
+    `;
+  } catch(e) { console.error(e); }
+}
+</script>
+</body>
+</html>

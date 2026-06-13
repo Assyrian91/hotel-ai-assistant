@@ -1,0 +1,31 @@
+HOTEL OPERATIONS GUIDE
+
+REVENUE MANAGEMENT
+- RevPAR (Revenue Per Available Room) = Total Room Revenue / Total Available Rooms
+- ADR (Average Daily Rate) = Total Room Revenue / Rooms Sold
+- Occupancy Rate = Rooms Sold / Total Available Rooms x 100
+- Target occupancy: 75%+ on weekdays, 90%+ on weekends
+- Target RevPAR: $150+ on regular nights, $200+ on peak nights
+
+PRICING RECOMMENDATIONS
+- Occupancy >90%: Increase rates by 15-25%
+- Occupancy 75-90%: Maintain or slight increase (5-10%)
+- Occupancy 50-75%: Consider promotions or slight reduction
+- Occupancy <50%: Activate discount packages, flash sales
+
+HOUSEKEEPING STANDARDS
+- Room turnover target: 30 minutes for standard, 45 for deluxe, 60 for suite
+- Deep clean schedule: every 7 days per occupied room
+- Linen change: every 3 days or on guest request
+- Minibar restock: on each checkout
+
+MAINTENANCE PROTOCOL
+- Urgent issues (flooding, no AC, electrical): 30 minutes response
+- High priority (TV, WiFi, plumbing minor): 2 hours response
+- Standard (light bulbs, cosmetic): next business day
+
+GUEST EXPERIENCE TARGETS
+- Check-in time: under 5 minutes
+- Guest satisfaction score target: 4.5/5
+- Complaint resolution: within 2 hours
+- Repeat guest rate target: 35%+
