@@ -1,3 +1,12 @@
+> ⚠️ **This repo has moved.** It's now maintained as part of
+> [`hotel-intelligence-suite`](https://github.com/Assyrian91/hotel-intelligence-suite),
+> a consolidated collection of hotel operations projects, with full commit
+> history preserved. This repo is archived and kept read-only for reference.
+
+---
+
+
+
 # 🏨 AI Hotel Operations Assistant
 
 An intelligent chat-based hotel management assistant powered by RAG, SQL agents, and LLMs.
